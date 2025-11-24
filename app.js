@@ -3,7 +3,7 @@ let bgMusic = document.getElementById('bg-music');
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Cargar configuración inicial
-    fetch('data.json')
+    fetch('https://raw.githubusercontent.com/Ange1BgLz/rsvp-dynamic/ab3b16e4dc1b1e6a9979b65459817aef7e9eb625/data.json?token=GHSAT0AAAAAADO7Z5TOWM2DTGT2WXAAIZUG2JDXQNQ')
         .then(response => {
             if (!response.ok) throw new Error("No se pudo leer data.json");
             return response.json();
@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             console.error('Error crítico:', error);
+            alert(error);
             alert("Error cargando la configuración. Revisa la consola.");
         });
     
@@ -101,7 +102,7 @@ async function openAdminMode() {
     const inputHash = CryptoJS.SHA256(password).toString();
 
     try {
-        const response = await fetch('secret.bin');
+        const response = await fetch('https://raw.githubusercontent.com/Ange1BgLz/rsvp-dynamic/ab3b16e4dc1b1e6a9979b65459817aef7e9eb625/secret.bin?token=GHSAT0AAAAAADO7Z5TPXIQ2DPXHLTBUR7KY2JDXRGA');
         if (!response.ok) throw new Error("Falta el archivo secret.bin");
         
         const trueHash = await response.text();
