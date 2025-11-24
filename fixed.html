@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boda de Ana & Carlos - ¡Estás invitado!</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --color-primary: #8A9A5B; /* Verde Salvia */
+            --color-secondary: #D4AF37; /* Dorado suave */
+            --color-bg: #FAFAF5; /* Crema muy suave */
+            --color-text: #4A4A4A;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-family: 'Lato', sans-serif;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--color-primary);
+        }
+
+        .script-font {
+            font-family: 'Great Vibes', cursive;
+            color: var(--color-secondary);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); /* Imagen genérica de boda */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .hero .date {
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 20px;
+        }
+
+        /* Cards y Secciones */
+        .section-padding {
+            padding: 80px 0;
+        }
+
+        .wedding-card {
+            border: none;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-radius: 15px;
+            padding: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .wedding-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon-box {
+            font-size: 2.5rem;
+            color: var(--color-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* Timeline del Itinerario */
+        .timeline-item {
+            padding: 20px;
+            border-left: 2px solid var(--color-primary);
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -9px;
+            top: 24px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border: 2px solid var(--color-primary);
+            border-radius: 50%;
+        }
+
+        /* Botón RSVP */
+        .btn-rsvp {
+            background-color: var(--color-primary);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-rsvp:hover {
+            background-color: #6e7c46;
+            color: white;
+            box-shadow: 0 5px 15px rgba(138, 154, 91, 0.4);
+        }
+
+        /* Formulario */
+        .form-control, .form-select {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 12px;
+        }
+        
+        .form-control:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 0.25rem rgba(138, 154, 91, 0.25);
+        }
+
+        /* Footer */
+        footer {
+            background-color: #fff;
+            padding: 40px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3rem; }
+            .section-padding { padding: 50px 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand script-font fs-3" href="#">A & C</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="#cuándo-dónde">Cuándo & Dónde</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#itinerario">Itinerario</a></li>
+                    <li class="nav-item"><a class="nav-link text-success fw-bold" href="#rsvp">Confirmar Asistencia</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container fade-in-up">
+            <p class="h4 mb-3 fw-light">¡Nos casamos!</p>
+            <h1 class="script-font display-1 mb-2">Ana & Carlos</h1>
+            <div class="date">25 • OCTUBRE • 2025</div>
+            <a href="#rsvp" class="btn btn-outline-light rounded-pill mt-4 px-4">Confirmar Asistencia</a>
+        </div>
+    </header>
+
+    <section id="cuándo-dónde" class="section-padding">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 mb-3">Detalles del Evento</h2>
+                <p class="text-muted w-75 mx-auto">Estamos muy emocionados de celebrar este día especial con nuestra familia y amigos.</p>
+            </div>
+
+            <div class="row justify-content-center g-4">
+                <div class="col-md-5">
+                    <div class="wedding-card text-center h-100">
+                        <i class="bi bi-heart icon-box"></i>
+                        <h3>Ceremonia</h3>
+                        <p class="lead mb-1">4:00 PM</p>
+                        <p class="fw-bold">Parroquia San Miguel</p>
+                        <p class="text-muted small">Calle de la Paz #123, Centro Histórico</p>
+                        <a href="#" class="btn btn-sm btn-outline-secondary mt-2">Ver en Mapa</a>
+                    </div>
+                </div>
+                
+                <div class="col-md-5">
+                    <div class="wedding-card text-center h-100">
+                        <i class="bi bi-music-note-beamed icon-box"></i>
+                        <h3>Recepción</h3>
+                        <p class="lead mb-1">6:00 PM</p>
+                        <p class="fw-bold">Hacienda Los Arcos</p>
+                        <p class="text-muted small">Carretera Nacional Km 20</p>
+                        <a href="#" class="btn btn-sm btn-outline-secondary mt-2">Ver en Mapa</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="itinerario" class="section-padding bg-white">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5">Itinerario</h2>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="timeline-item">
+                        <h5 class="fw-bold">4:00 PM - Ceremonia Religiosa</h5>
+                        <p class="text-muted mb-0">Por favor llegar 15 minutos antes.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h5 class="fw-bold">6:00 PM - Cóctel de Bienvenida</h5>
+                        <p class="text-muted mb-0">Música en vivo y aperitivos en el jardín.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h5 class="fw-bold">7:30 PM - Cena</h5>
+                        <p class="text-muted mb-0">Menú de 3 tiempos.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h5 class="fw-bold">9:00 PM - ¡A Bailar!</h5>
+                        <p class="text-muted mb-0">Inicio de la fiesta.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="rsvp" class="section-padding" style="background-color: #f2f4ef;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="wedding-card text-center">
+                        <h2 class="mb-4">¿Nos acompañas?</h2>
+                        <p class="mb-4">Por favor confirma tu asistencia antes del <strong>1 de Octubre</strong>.</p>
+                        
+                        <form onsubmit="event.preventDefault(); alert('¡Gracias por confirmar! (Esto es una demo)');">
+                            <div class="row g-3 text-start">
+                                <div class="col-md-6">
+                                    <label for="nombre" class="form-label small text-uppercase fw-bold">Nombre Completo</label>
+                                    <input type="text" class="form-control" id="nombre" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="telefono" class="form-label small text-uppercase fw-bold">Teléfono</label>
+                                    <input type="tel" class="form-control" id="telefono" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small text-uppercase fw-bold">Asistencia</label>
+                                    <select class="form-select" required>
+                                        <option value="" selected disabled>Selecciona una opción</option>
+                                        <option value="si">¡Sí, ahí estaré!</option>
+                                        <option value="no">Lamentablemente no podré asistir</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="mensaje" class="form-label small text-uppercase fw-bold">Restricciones alimentarias o mensaje</label>
+                                    <textarea class="form-control" id="mensaje" rows="3"></textarea>
+                                </div>
+                                <div class="col-12 text-center mt-4">
+                                    <button type="submit" class="btn-rsvp w-100 w-md-auto">Enviar Confirmación</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding text-center">
+        <div class="container">
+            <i class="bi bi-gift fs-1 text-muted mb-3 d-block"></i>
+            <h3>Mesa de Regalos</h3>
+            <p class="text-muted">Su presencia es nuestro mejor regalo, pero si desean tener un detalle con nosotros...</p>
+            <div class="d-flex justify-content-center gap-3 mt-3">
+                <button class="btn btn-outline-dark btn-sm">Amazon</button>
+                <button class="btn btn-outline-dark btn-sm">Liverpool</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p class="mb-0">Hecho con <i class="bi bi-heart-fill text-danger"></i> para nuestra boda</p>
+            <small>© 2025 Ana & Carlos</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

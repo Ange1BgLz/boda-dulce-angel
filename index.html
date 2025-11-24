@@ -8,22 +8,36 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant:wght@400;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css">
-
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
 
-    <audio id="bg-music" loop></audio>
-
-    <div id="music-control" onclick="toggleMusic()">
-        <i class="bi bi-music-note-beamed fs-4"></i>
+    <!-- Carta de bienvenida animada -->
+    <div id="welcome-envelope" class="envelope-overlay">
+        <div class="envelope">
+            <div class="envelope-flap"></div>
+            <div class="envelope-front"></div>
+            <div class="envelope-letter">
+                <div class="envelope-letter-content">
+                    <h2 class="script-font fs-2 mb-3">¡Estás invitado!</h2>
+                    <p class="lead">Acompáñanos a celebrar la boda de</p>
+                    <h1 class="script-font mb-2" id="envelope-names"></h1>
+                    <div class="fs-4 mb-3" id="envelope-date"></div>
+                    <button id="open-envelope-btn" class="btn btn-lg btn-primary rounded-pill px-5">Abrir invitación</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <audio id="bg-music" loop></audio>
+    <div id="music-control" onclick="toggleMusic()"><i class="bi bi-music-note-beamed fs-4"></i></div>
 
     <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand script-font fs-3" href="#">A & C</a>
+            <a class="navbar-brand script-font fs-3" href="#" id="nav-names">A & C</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -31,7 +45,7 @@
                 <ul class="navbar-nav align-items-center">
                     <li class="nav-item"><a class="nav-link" href="#rsvp">Confirmar Asistencia</a></li>
                     <li class="nav-item border-start ms-2 ps-2">
-                        <a class="nav-link text-secondary" href="#" onclick="openAdminMode()"><i class="bi bi-gear-fill"></i></a>
+                        <a class="nav-link text-secondary" href="#" id="btn-admin-mode"><i class="bi bi-gear-fill"></i></a>
                     </li>
                 </ul>
             </div>
@@ -45,23 +59,77 @@
         
         <div class="container hero-content">
             <p class="h4 mb-3 fw-light" id="hero-pretitle"></p>
-            <h1 class="script-font display-1 mb-2" id="hero-names"></h1>
-            <div class="fs-4 mt-3" id="hero-date"></div>
+            <h1 class="script-font fs-1 mb-2" id="hero-names"></h1>
+            <div class="fs-4 mt-3 text-uppercase" id="hero-date"></div>
             <a href="#rsvp" class="btn btn-outline-light rounded-pill mt-4 px-4" id="hero-cta"></a>
         </div>
     </header>
 
-    <section class="section-padding">
+    <section class="section-padding animated-fadein-slow" id="main-content" style="display:none;">
         <div class="container text-center">
-            <h2 class="display-5 mb-3">Detalles</h2>
-            <p class="text-muted w-75 mx-auto mb-5" id="details-desc"></p>
-            
+            <h2 class="display-5 mb-3 animated-fadein-text delay-1">Nuestra Boda</h2>
+            <p class="text-muted w-75 mx-auto mb-5 animated-fadein-text delay-2" id="details-desc"></p>
+            <div class="mb-4 animated-fadein-text delay-3">
+                <div id="calendar-btn-container"></div>
+            </div>
+            <div class="text-start w-75 mx-auto animated-fadein-text delay-4">
+                <label class="fw-bold mb-2">Recomendaciones para los invitados:</label>
+                <textarea id="event-guidelines" class="form-control mb-3" rows="6" readonly></textarea>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding bg-white animated-fadein">
+        <div class="container">
+            <h2 class="display-5 text-center mb-5">Padres de los Novios</h2>
+            <div class="row justify-content-center" id="parents-section"></div>
+        </div>
+    </section>
+
+    <section class="section-padding bg-white animated-fadein">
+        <div class="container">
+            <h2 class="display-5 text-center mb-5">Itinerario</h2>
             <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <div class="wedding-card">
-                        <i class="bi bi-geo-alt icon-box"></i>
-                        <h3>Ceremonia & Fiesta</h3>
-                        <p class="text-muted">La ubicación se actualizará dinámicamente.</p>
+                <div class="col-md-8 col-lg-6" id="itinerary-container">
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding text-center animated-fadein">
+        <div class="container">
+            <i class="bi bi-gift fs-1 text-muted mb-3 d-block"></i>
+            <h3>Mesa de Regalos</h3>
+            <p class="text-muted" id="registry-desc"></p>
+            <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap" id="registry-buttons">
+                </div>
+        </div>
+    </section>
+
+    <section id="rsvp" class="section-padding animated-fadein" style="background-color: #f2f4ef;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="wedding-card text-center">
+                        <h2 class="mb-4">¿Nos acompañas?</h2>
+                        <p class="mb-4">Por favor confirma antes del <strong id="rsvp-deadline"></strong>.</p>
+                        <form id="rsvp-form" method="POST">
+                            <div class="row g-3 text-start">
+                                <div class="col-md-6"><input type="text" name="nombre" class="form-control" placeholder="Nombre Completo" required></div>
+                                <div class="col-md-6"><input type="tel" name="telefono" class="form-control" placeholder="Teléfono" required></div>
+                                <div class="col-12">
+                                    <select name="asistencia" class="form-select" required>
+                                        <option value="" disabled selected>Selecciona una opción</option>
+                                        <option value="si">¡Sí, ahí estaré!</option>
+                                        <option value="no">No podré asistir</option>
+                                    </select>
+                                </div>
+                                <div class="col-12"><textarea name="mensaje" class="form-control" rows="2" placeholder="Mensaje para los novios"></textarea></div>
+                                <div class="col-12 text-center mt-4">
+                                    <button type="submit" class="btn-rsvp w-100">Enviar Confirmación</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -72,57 +140,18 @@
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Modo Edición</h5>
+                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Editor de Boda</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="admin-form">
-                        <h6 class="border-bottom pb-2">Hero / Portada</h6>
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label small">Nombres</label>
-                                <input type="text" class="form-control" name="heroNames" id="input-hero-names">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small">Tipo de Fondo</label>
-                                <select class="form-select" name="heroType" id="input-hero-type">
-                                    <option value="image">Imagen Estática</option>
-                                    <option value="video">Video (Muted)</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label small">URL del Fondo</label>
-                                <input type="text" class="form-control" name="heroUrl" id="input-hero-url">
-                            </div>
-                        </div>
-
-                        <h6 class="border-bottom pb-2 mt-4">Música</h6>
-                        <div class="form-check form-switch mb-2">
-                            <input class="form-check-input" type="checkbox" id="input-music-enabled">
-                            <label class="form-check-label" for="input-music-enabled">Activar Música</label>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small">URL Música (MP3)</label>
-                            <input type="text" class="form-control" id="input-music-url">
-                        </div>
-                        
-                        <h6 class="border-bottom pb-2 mt-4">Estilos</h6>
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <label class="form-label small">Color Principal</label>
-                                <input type="color" class="form-control form-control-color w-100" id="input-color-primary">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label small">Color Secundario</label>
-                                <input type="color" class="form-control form-control-color w-100" id="input-color-secondary">
-                            </div>
-                        </div>
-                    </form>
+                    <form id="admin-form-container" class="row g-3"></form>
                 </div>
                 <div class="modal-footer bg-light">
-                    <small class="text-muted me-auto">Previsualización activa.</small>
+                    <small class="text-muted me-auto">Cambios aplicados en tiempo real (Vista Previa).</small>
+                    <button type="button" class="btn btn-primary" onclick="addItineraryItem()">+ Evento</button>
+                     <button type="button" class="btn btn-info text-white" onclick="addRegistryItem()">+ Regalo</button>
                     <button type="button" class="btn btn-success" onclick="downloadConfig()">
-                        <i class="bi bi-download me-2"></i>Descargar JSON
+                        <i class="bi bi-download me-2"></i>Guardar Cambios (JSON)
                     </button>
                 </div>
             </div>
@@ -130,7 +159,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/add-to-calendar-button@2.4.7/dist/atcb.min.js" async defer></script>
     <script src="app.js"></script>
-    
 </body>
 </html>
