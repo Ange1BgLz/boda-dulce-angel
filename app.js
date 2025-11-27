@@ -1,7 +1,16 @@
 let currentData = {};
 let bgMusic = document.getElementById('bg-music');
+let countdownInterval = null
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Esto evita que el navegador restaure la posición del scroll al recargar
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    // Mueve la ventana a la coordenada 0,0 instantáneamente
+    window.scrollTo(0, 0);
+
     // 1. Cargar configuración inicial
     fetch('data.json?ts=' + Date.now())
         .then(response => {
@@ -15,14 +24,27 @@ document.addEventListener('DOMContentLoaded', () => {
             // Renderizamos el sitio
             renderSite(data);
 
-            // Envelope animado
+                        // Envelope animado
             document.getElementById('envelope-names').innerHTML = `${data.wedding.brideName} <br>&<br> ${data.wedding.groomName}`;
             document.getElementById('envelope-date').textContent = formatDateMexico(data.wedding.eventDate);
             document.getElementById('welcome-envelope').style.display = 'flex';
             document.getElementById('main-content').style.display = 'none';
             document.body.style.overflow = 'hidden'; // Desactiva scroll
+            
             document.getElementById('open-envelope-btn').onclick = function () {
+                // 1. Iniciar animación visual
                 document.getElementById('welcome-envelope').classList.add('opened');
+                
+                // 2. Intentar reproducir música si está habilitada
+                if (currentData.music && currentData.music.enabled) {
+                    const audio = document.getElementById('bg-music');
+                    // Usamos una lógica directa aquí para asegurar el "Play" y no un "Toggle" accidental
+                    if (audio.paused) {
+                        window.toggleMusic(); 
+                    }
+                }
+
+                // 3. Temporizador para ocultar el sobre y mostrar contenido
                 setTimeout(() => {
                     document.getElementById('welcome-envelope').style.display = 'none';
                     document.getElementById('main-content').style.display = '';
@@ -171,17 +193,28 @@ window.addEventListener('scroll', animateOnScroll);
 window.addEventListener('DOMContentLoaded', animateOnScroll);
 
 // --- UTILIDADES DE FORMATO VISUAL (Para el usuario) ---
-function formatDateMexico(isoDateString) {
+function formatDateMexico(isoDateString, isModernStyle = true) {
     if (!isoDateString) return "";
     const date = new Date(isoDateString);
-    return new Intl.DateTimeFormat('es-MX', {
-        timeZone: 'America/Mexico_City',
-        day: 'numeric', month: 'long', year: 'numeric'
-    }).format(date);
+    const options = { timeZone: 'America/Mexico_City' };
+
+    if (isModernStyle) {
+        // Formato Moderno: 26 • diciembre • 2025
+        const day = new Intl.DateTimeFormat('es-MX', { ...options, day: 'numeric' }).format(date);
+        const month = new Intl.DateTimeFormat('es-MX', { ...options, month: 'long' }).format(date);
+        const year = new Intl.DateTimeFormat('es-MX', { ...options, year: 'numeric' }).format(date);
+        return `${day} • ${month} • ${year}`;
+    } else {
+        // Formato Tradicional: 26 de diciembre de 2025
+        // Al pedir day, month y year juntos, JS agrega automáticamente los "de"
+        return new Intl.DateTimeFormat('es-MX', {
+            ...options,
+            day: 'numeric', month: 'long', year: 'numeric'
+        }).format(date);
+    }
 }
 
 // --- UTILIDADES DE FORMATO PARA INPUTS (Para el panel de admin) ---
-// Corrige el problema de fechas vacías en el editor
 function toInputDate(isoString) {
     if (!isoString) return "";
     // El input datetime-local solo acepta los primeros 16 caracteres: YYYY-MM-DDTHH:MM
@@ -254,43 +287,126 @@ function renderSite(data) {
     const parentsSection = document.getElementById('parents-section');
     if (parentsSection && safeData.parents) {
         parentsSection.innerHTML = '';
-        const parentList = [
-            { label: 'Padre del Novio', data: safeData.parents.groomFather },
-            { label: 'Madre del Novio', data: safeData.parents.groomMother },
-            { label: 'Padre de la Novia', data: safeData.parents.brideFather },
-            { label: 'Madre de la Novia', data: safeData.parents.brideMother }
-        ];
-        parentList.forEach(parent => {
-            if (!parent.data) return;
-            const emoji = parent.data.deceased ? '🕊️ ' : '';
-            parentsSection.innerHTML += `<div class='col-12 col-md-6 mb-2'><div class='p-3 border rounded bg-light'><span class='fw-bold'>${parent.label}:</span> ${emoji}${parent.data.name || ''}</div></div>`;
-        });
+
+        // Helper para renderizar nombres con emoji si aplica
+        const renderParentName = (person) => {
+            if (!person || !person.name) return '';
+            const emoji = person.deceased ? '✞ ' : '';
+            return `<div class="fs-6 mb-1">${emoji}${person.name}</div>`;
+        };
+
+        // 1. Bloque Padres de la NOVIA (Primero)
+        // Usamos col-6 para que siempre ocupen el 50% de la pantalla (lado a lado)
+        const brideBlock = `
+            <div class='col-6 mb-2'>
+                <div class='p-3 border rounded bg-light h-100 d-flex flex-column justify-content-center align-items-center'>
+                    <h5 class="script-font mb-2" style="color: var(--color-primary);">Padres de la Novia</h5>
+                    ${renderParentName(safeData.parents.brideFather)}
+                    ${renderParentName(safeData.parents.brideMother)}
+                </div>
+            </div>`;
+
+        // 2. Bloque Padres del NOVIO (Segundo)
+        const groomBlock = `
+            <div class='col-6 mb-2'>
+                <div class='p-3 border rounded bg-light h-100 d-flex flex-column justify-content-center align-items-center'>
+                    <h5 class="script-font mb-2" style="color: var(--color-primary);">Padres del Novio</h5>
+                    ${renderParentName(safeData.parents.groomFather)}
+                    ${renderParentName(safeData.parents.groomMother)}
+                </div>
+            </div>`;
+
+        // Insertamos los bloques en el orden solicitado
+        parentsSection.innerHTML = brideBlock + groomBlock;
     }
 
     // Botón Add to Calendar dinámico
     const calendarContainer = document.getElementById('calendar-btn-container');
-    if (calendarContainer && safeData.wedding) {
+    
+    // Validación estricta: Si no hay contenedor o fecha, no hacemos nada.
+    if (calendarContainer && safeData.wedding && safeData.wedding.eventDate) {
+        
+        const isoDate = safeData.wedding.eventDate; // Ej: "2024-12-31T20:00"
+        const [datePart, timePart] = isoDate.includes('T') ? isoDate.split('T') : [isoDate, '00:00'];
+
+        // Construimos el string HTML manualmente.
+        // Esto es más robusto porque espera a que el script del CDN cargue para renderizarse.
+        const atcbHTML = `
+            <add-to-calendar-button
+                name="Boda de ${safeData.wedding.brideName} & ${safeData.wedding.groomName}"
+                description="${safeData.eventGuidelines || '¡Gracias por acompañarnos!'}"
+                startDate="${datePart}"
+                startTime="${timePart}"
+                endDate="${datePart}"
+                endTime="23:59"
+                timeZone="America/Mexico_City"
+                location="${safeData.details.location || 'Ubicación pendiente'}"
+                options="'Apple','Google','iCal','Outlook.com','Yahoo','Microsoft365'"
+                buttonStyle="round"
+                lightMode="bodyScheme"
+                organizer="${safeData.wedding.brideName} & ${safeData.wedding.groomName}"
+                organizerEmail="boda@ejemplo.com"
+            ></add-to-calendar-button>
+        `;
+
+        calendarContainer.innerHTML = atcbHTML;
+    } else if (calendarContainer) {
+        // Limpiar si no hay fecha para evitar residuos
         calendarContainer.innerHTML = '';
-        const atcb = document.createElement('add-to-calendar-button');
-        atcb.setAttribute('name', `Boda de ${safeData.wedding.groomName || ''} & ${safeData.wedding.brideName || ''}`);
-        atcb.setAttribute('start-date', (safeData.wedding.eventDate || '').split('T')[0]);
-        atcb.setAttribute('start-time', (safeData.wedding.eventDate || '').split('T')[1] || '16:00');
-        atcb.setAttribute('end-date', (safeData.wedding.eventDate || '').split('T')[0]);
-        atcb.setAttribute('end-time', '23:59');
-        atcb.setAttribute('location', safeData.details.location || 'Ver invitación para dirección.');
-        atcb.setAttribute('organizer', `${safeData.wedding.groomName || ''} & ${safeData.wedding.brideName || ''}`);
-        atcb.setAttribute('organizer-email', 'novios@email.com');
-        atcb.setAttribute('description', safeData.eventGuidelines || '¡Acompáñanos en este día tan especial!');
-        atcb.setAttribute('options', 'Apple,Google,Outlook,Microsoft365,Outlook.com,ICS');
-        atcb.setAttribute('time-zone', 'America/Mexico_City');
-        atcb.setAttribute('hide-background', '');
-        atcb.setAttribute('light-mode', 'system');
-        calendarContainer.appendChild(atcb);
     }
 
     // Fechas Visuales
     setText('hero-date', formatDateMexico(safeData.wedding.eventDate));
-    setText('rsvp-deadline', formatDateMexico(safeData.wedding.rsvpDeadline));
+    setText('rsvp-deadline', formatDateMexico(safeData.wedding.rsvpDeadline, false));
+    
+    // --- LÓGICA DE CUENTA REGRESIVA ---
+    const countdownContainer = document.getElementById('hero-countdown');
+    
+    // 1. Limpiar intervalo previo (importante si editas la fecha en el admin)
+    if (countdownInterval) clearInterval(countdownInterval);
+
+    if (countdownContainer && safeData.wedding.eventDate) {
+        const targetDate = new Date(safeData.wedding.eventDate).getTime();
+
+        // Función de actualización
+        const updateTimer = () => {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                // Si la fecha ya pasó
+                clearInterval(countdownInterval);
+                countdownContainer.innerHTML = '<div class="badge bg-light text-dark fs-5 px-4 py-2 opacity-75">¡Es hoy!</div>';
+                return;
+            }
+
+            // Cálculos matemáticos
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Helper HTML
+            const itemHTML = (num, label) => `
+                <div class="countdown-item">
+                    <div class="countdown-number">${num < 10 ? '0' + num : num}</div>
+                    <div class="countdown-label">${label}</div>
+                </div>`;
+
+            countdownContainer.innerHTML = 
+                itemHTML(days, 'Días') + 
+                itemHTML(hours, 'Hs') + 
+                itemHTML(minutes, 'Min') + 
+                itemHTML(seconds, 'Seg');
+        };
+
+        // Ejecutar inmediatamente (para no esperar 1 segundo al renderizar)
+        updateTimer();
+        // Iniciar intervalo
+        countdownInterval = setInterval(updateTimer, 1000);
+    } else if (countdownContainer) {
+        countdownContainer.innerHTML = ''; // Limpiar si no hay fecha
+    }
 
     // Lógica Hero Media
     const imgDiv = document.getElementById('hero-bg-image');
@@ -310,9 +426,20 @@ function renderSite(data) {
     // Música
     const musicBtn = document.getElementById('music-control');
     if (safeData.music.enabled) {
-        musicBtn.style.display = 'flex';
-        if (bgMusic.getAttribute('src') !== safeData.music.url) bgMusic.src = safeData.music.url;
+        // Si 'preventPause' es true, ocultamos el botón aunque la música esté activa.
+        // Si es false, mostramos el botón para que el usuario pueda pausar.
+        if (safeData.music.preventPause) {
+            musicBtn.style.display = 'none';
+        } else {
+            musicBtn.style.display = 'flex';
+        }
+
+        // Actualizar fuente si cambió
+        if (bgMusic.getAttribute('src') !== safeData.music.url) {
+            bgMusic.src = safeData.music.url;
+        }
     } else {
+        // Música deshabilitada completamente
         musicBtn.style.display = 'none';
         bgMusic.pause();
     }
@@ -323,9 +450,14 @@ function renderSite(data) {
         itinContainer.innerHTML = '';
         safeData.itinerary.forEach((item, idx) => {
             const time12 = item.time ? new Date(`1970-01-01T${item.time}`).toLocaleTimeString('es-MX', { hour: 'numeric', minute: '2-digit', hour12: true }) : '';
-            const delayClass = `animated-fadein-text delay-${idx + 1}`;
+            
+            // Calculamos el retraso dinámicamente: 300ms * índice
+            // Elemento 0: 0ms, Elemento 1: 300ms, Elemento 2: 600ms...
+            const delayMs = idx * 300; 
+
+            // Aplicamos style="animation-delay" directamente
             itinContainer.innerHTML += `
-                <div class="timeline-item ${delayClass}">
+                <div class="timeline-item animated-fadein-text" style="animation-delay: ${delayMs}ms;">
                     <h5 class="fw-bold">${time12} - ${item.activity}</h5>
                     <p class="text-muted mb-0">${item.description || ''}</p>
                 </div>`;
@@ -487,16 +619,55 @@ function buildAdminForm() {
 
     // 3. MÚSICA
     addSectionTitle("Música");
-    const musicDiv = document.createElement('div');
-    musicDiv.className = "col-12 d-flex align-items-center";
-    musicDiv.innerHTML = `
+    
+    // Contenedor para los interruptores
+    const musicControlsDiv = document.createElement('div');
+    musicControlsDiv.className = "col-12 d-flex flex-wrap gap-3 mb-2";
+
+    const isMusicEnabled = currentData.music.enabled;
+
+    musicControlsDiv.innerHTML = `
+        <!-- Switch 1: Activar General -->
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" ${currentData.music.enabled ? 'checked' : ''}>
-            <label class="form-check-label small fw-bold ms-2">Activar Música</label>
+            <input class="form-check-input" type="checkbox" id="musicEnableCheck" ${isMusicEnabled ? 'checked' : ''}>
+            <label class="form-check-label small fw-bold ms-2" for="musicEnableCheck">Activar Música</label>
+        </div>
+
+        <!-- Switch 2: Bloquear Pausa (Habilitado solo si música activa) -->
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="musicPreventPauseCheck" 
+                   ${currentData.music.preventPause ? 'checked' : ''} 
+                   ${!isMusicEnabled ? 'disabled' : ''}>
+            <label class="form-check-label small fw-bold ms-2" for="musicPreventPauseCheck">
+                Bloquear control (Ocultar botón)
+            </label>
         </div>`;
-    musicDiv.querySelector('input').addEventListener('change', (e) => { currentData.music.enabled = e.target.checked; renderSite(currentData); });
-    container.appendChild(musicDiv);
-    container.appendChild(createInput("URL Música (MP3)", currentData.music.url, "text", v => { currentData.music.url = v; renderSite(currentData); }));
+
+    // Evento: Activar/Desactivar Música
+    musicControlsDiv.querySelector('#musicEnableCheck').addEventListener('change', (e) => {
+        currentData.music.enabled = e.target.checked;
+        // Reconstruimos el form para habilitar/deshabilitar visualmente los otros campos
+        buildAdminForm(); 
+        renderSite(currentData);
+    });
+
+    // Evento: Bloquear Pausa
+    musicControlsDiv.querySelector('#musicPreventPauseCheck').addEventListener('change', (e) => {
+        currentData.music.preventPause = e.target.checked;
+        renderSite(currentData);
+    });
+
+    container.appendChild(musicControlsDiv);
+
+    // Input URL: Se pasa '!isMusicEnabled' como 6to argumento para deshabilitarlo
+    container.appendChild(createInput(
+        "URL Música (MP3)", 
+        currentData.music.url, 
+        "text", 
+        v => { currentData.music.url = v; renderSite(currentData); }, 
+        "col-12", 
+        !isMusicEnabled // disabled = true si la música NO está habilitada
+    ));
 
     // 4. DETALLES
     addSectionTitle("Detalles");
@@ -543,6 +714,19 @@ function buildAdminForm() {
         wrapper.appendChild(row);
         container.appendChild(wrapper);
     });
+
+    // Botón +Evento
+    const addItinBtnDiv = document.createElement('div');
+    addItinBtnDiv.className = "col-12 text-end mb-2";
+    
+    const addItinBtn = document.createElement('button');
+    addItinBtn.type = "button";
+    addItinBtn.className = "btn btn-primary text-white"; 
+    addItinBtn.textContent = "+ Evento";
+    addItinBtn.onclick = window.addItineraryItem;
+    
+    addItinBtnDiv.appendChild(addItinBtn);
+    container.appendChild(addItinBtnDiv);
 
     // 8. MESA REGALOS
     addSectionTitle("Regalos");
@@ -691,4 +875,31 @@ window.downloadConfig = function () {
     document.body.removeChild(a);
 
     alert("✅ Archivo data.json generado. Súbelo a GitHub.");
+};
+
+// --- CONTROL DE MÚSICA ---
+window.toggleMusic = function() {
+    const audio = document.getElementById('bg-music');
+    const btnIcon = document.querySelector('#music-control i');
+    
+    // Si no hay audio o fuente, no hacemos nada
+    if (!audio || !audio.src) return;
+
+    if (audio.paused) {
+        audio.play().then(() => {
+            // Si se reproduce correctamente, cambiamos el ícono a "Pausa"
+            btnIcon.classList.remove('bi-music-note-beamed');
+            btnIcon.classList.add('bi-pause-circle');
+            // Añadimos una clase para animación de rotación suave (opcional)
+            document.getElementById('music-control').classList.add('playing');
+        }).catch(error => {
+            console.log("Reproducción bloqueada por el navegador: ", error);
+        });
+    } else {
+        audio.pause();
+        // Cambiamos el ícono de vuelta a "Nota Musical"
+        btnIcon.classList.remove('bi-pause-circle');
+        btnIcon.classList.add('bi-music-note-beamed');
+        document.getElementById('music-control').classList.remove('playing');
+    }
 };

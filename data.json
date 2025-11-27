@@ -8,7 +8,7 @@
   "theme": {
     "primaryColor": "#4d0000",
     "secondaryColor": "#D4AF37",
-    "backgroundColor": "#FAFAF5"
+    "backgroundColor": "#F7E6CA"
   },
   "hero": {
     "preTitle": "¡Nos casamos!",
@@ -17,8 +17,9 @@
     "url": "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
   },
   "music": {
-    "enabled": false,
-    "url": ""
+    "enabled": true,
+    "preventPause": true,
+    "url": "KARAOKE%20BOLERO%20SOUL%20-%20Si%20nos%20dejan%20%5BqEW6EtQbPTQ%5D.mp3"
   },
   "details": {
     "description": "Estamos muy emocionados de celebrar este día especial con nuestra familia y amigos."
@@ -41,7 +42,7 @@
       "deceased": false
     }
   },
-  "eventGuidelines": "1. Por favor llega al menos 20 minutos antes del inicio para que podamos comenzar puntuales.\n2. Confirma tu asistencia lo antes posible para ayudarnos a organizar todo perfecto.\n3. Sigue las indicaciones del personal y disfruta la celebración.\n4. Recuerda que el evento tiene un horario de cierre, ¡aprovecha cada momento!",
+  "eventGuidelines": "1. Confirma tu asistencia lo antes posible para ayudarnos a organizar todo perfecto.\n2. Sigue las indicaciones del personal y disfruta la celebración.\n3. Recuerda que el evento tiene un horario de cierre, ¡aprovecha cada momento!",
   "itinerary": [
     {
       "time": "15:30",
@@ -54,24 +55,14 @@
       "description": ""
     },
     {
-      "time": "16:30",
-      "activity": "Sesión de fotos",
-      "description": ""
-    },
-    {
       "time": "17:00",
       "activity": "Comida",
       "description": "Asado tradicional de bodas"
     },
     {
-      "time": "18:30",
-      "activity": "Postre",
-      "description": ""
-    },
-    {
       "time": "20:00",
       "activity": "Brindis",
-      "description": ""
+      "description": "¡Salud!"
     },
     {
       "time": "21:00",

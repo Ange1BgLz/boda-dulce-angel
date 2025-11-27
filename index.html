@@ -12,24 +12,44 @@
     
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/add-to-calendar-button@2" async defer></script>
 </head>
 <body>
 
-    <!-- Carta de bienvenida animada -->
-    <div id="welcome-envelope" class="envelope-overlay">
-        <div class="envelope">
+        <!-- Carta de bienvenida animada (Reestructurada) -->
+    <div id="welcome-envelope" class="envelope-overlay" style="flex-direction: column;">
+        
+        <!-- 1. TEXTO SUPERIOR (Fuera del sobre) -->
+        <div class="text-center mb-4" style="z-index: 10; position: relative;">
+            <h2 class="script-font fs-1 mb-2">¡Estás invitado!</h2>
+            <p class="lead" style="color: var(--color-secondary);">Acompáñanos a celebrar la boda de</p>
+        </div>
+
+        <!-- 2. EL SOBRE (Contiene SOLO los nombres) -->
+        <div class="envelope mb-4">
             <div class="envelope-flap"></div>
             <div class="envelope-front"></div>
+            
+            <!-- La carta interior -->
             <div class="envelope-letter">
-                <div class="envelope-letter-content">
-                    <h2 class="script-font fs-2 mb-3">¡Estás invitado!</h2>
-                    <p class="lead">Acompáñanos a celebrar la boda de</p>
-                    <h1 class="script-font mb-2" id="envelope-names"></h1>
-                    <div class="fs-4 mb-3" id="envelope-date"></div>
-                    <button id="open-envelope-btn" class="btn btn-lg btn-primary rounded-pill px-5">Abrir invitación</button>
+                <div class="envelope-letter-content h-100 d-flex align-items-center justify-content-center">
+                    <!-- Aquí solo van los nombres para simular que están escritos en el papel -->
+                    <h1 class="script-font m-0" id="envelope-names" style="line-height: 1.2; font-size: 3rem;"></h1>
                 </div>
             </div>
         </div>
+
+        <!-- 3. TEXTO INFERIOR (Fecha y Botón fuera del sobre) -->
+        <div class="text-center mt-2" style="z-index: 10; position: relative;">
+            <!-- La fecha fuera -->
+            <div class="fs-2 mb-4 script-font" id="envelope-date" style="color: var(--color-secondary);"></div>
+            
+            <button id="open-envelope-btn" class="btn btn-lg rounded-pill px-5 shadow-lg fw-bold">
+                Abrir invitación
+            </button>
+        </div>
+
     </div>
 
     <audio id="bg-music" loop></audio>
@@ -61,6 +81,7 @@
             <p class="h4 mb-3 fw-light" id="hero-pretitle"></p>
             <h1 class="script-font fs-1 mb-2" id="hero-names"></h1>
             <div class="fs-4 mt-3 text-uppercase" id="hero-date"></div>
+            <div id="hero-countdown" class="d-flex justify-content-center flex-wrap gap-3 mt-4"></div>
             <a href="#rsvp" class="btn btn-outline-light rounded-pill mt-4 px-4" id="hero-cta"></a>
         </div>
     </header>
@@ -81,14 +102,13 @@
 
     <section class="section-padding bg-white animated-fadein" id="parents">
         <div class="container">
-            <h2 class="display-5 text-center mb-5 animated-fadein-text delay-1">Padres de los Novios</h2>
             <div class="row justify-content-center animated-fadein-text delay-2" id="parents-section"></div>
         </div>
     </section>
 
     <section class="section-padding bg-white animated-fadein" id="itinerary">
         <div class="container">
-            <h2 class="display-5 text-center mb-5 animated-fadein-text delay-1">Itinerario</h2>
+            <h2 class="display-5 text-center mb-1 animated-fadein-text delay-1">Itinerario</h2>
             <div class="row justify-content-center animated-fadein-text delay-2">
                 <div class="col-md-8 col-lg-6" id="itinerary-container"></div>
             </div>
@@ -104,7 +124,7 @@
         </div>
     </section>
 
-    <section id="rsvp" class="section-padding animated-fadein" style="background-color: #f2f4ef;">
+    <section id="rsvp" class="section-padding animated-fadein" style="color: var(--color-bg);">
         <div class="container">
             <div class="row justify-content-center animated-fadein-text delay-1">
                 <div class="col-lg-8">
@@ -146,7 +166,6 @@
                 </div>
                 <div class="modal-body position-relative">
                     <form id="admin-form-container" class="row g-3"></form>
-                    <button type="button" class="btn btn-primary position-absolute" id="add-itinerary-btn" style="right: 2rem; top: 1rem; z-index: 10;">+ Evento</button>
                 </div>
                 <div class="modal-footer bg-light">
                     <small class="text-muted me-auto">Cambios aplicados en tiempo real (Vista Previa).</small>
@@ -179,9 +198,6 @@
     <div id="admin-modal-minimized" style="display:none; position:fixed; bottom:2rem; right:2rem; z-index:2000;">
       <button class="btn btn-dark rounded-pill shadow" id="restore-admin-modal"><i class="bi bi-pencil-square me-2"></i>Restaurar editor</button>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/add-to-calendar-button@2.4.7/dist/atcb.min.js" async defer></script>
     <script src="app.js"></script>
 </body>
 </html>

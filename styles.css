@@ -8,6 +8,23 @@
     --hero-overlay: rgba(0, 0, 0, 0.4);
 }
 
+/* --- THIRD COLOR DINÁMICO --- */
+
+/* 
+   Sobrescribimos la clase .bg-white de Bootstrap SOLO dentro de las secciones.
+   Usamos color-mix para mezclar el color de fondo configurado (--color-bg) con blanco.
+*/
+section.section-padding.bg-white {
+    /* 
+       Lógica: 
+       Mezcla 'white' (50%) con 'var(--color-bg)' (15%).
+    */
+    background-color: color-mix(in srgb, var(--color-bg), white 50%) !important;
+    
+    /* Opcional: una transición suave si cambias el color desde el admin */
+    transition: background-color 0.5s ease;
+}
+
 /* 2. Estilos Globales */
 body, html {
     font-family: 'Cormorant', Cormorant, sans-serif !important;
@@ -15,7 +32,7 @@ body, html {
 }
 
 body {
-    background: #fafaf5;
+    background: var(--color-bg);
     color: #444;
     overflow-x: hidden;
     transition: background-color 0.5s ease; /* Suaviza el cambio de color */
@@ -32,7 +49,7 @@ h1, h2, h3 {
 .script-font {
     font-family: 'Great Vibes', 'Playfair Display', cursive, serif;
     letter-spacing: 2px;
-    color: #8a9a5b;
+    color: var (--color-primary);
     transition: color 0.3s ease;
     font-size: 2.5rem;
 }
@@ -347,7 +364,40 @@ h1, h2, h3 {
 }
 
 textarea[readonly] {
-  background: #f8f9fa;
+  background: var(--color-bg);
   border: 1px solid #e0e0e0;
   color: #888;
+}
+
+/* --- CUENTA REGRESIVA --- */
+.countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15); /* Transparencia estilo vidrio */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    min-width: 70px;
+    padding: 10px;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.countdown-number {
+    font-family: 'Playfair Display', serif; /* Misma fuente que tus títulos */
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.countdown-label {
+    font-family: 'Lato', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 5px;
+    opacity: 0.9;
 }
