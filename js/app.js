@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo(0, 0);
 
     // 1. Cargar configuración inicial
-    fetch('data.json?ts=' + Date.now())
+    fetch('config/data.json?ts=' + Date.now())
         .then(response => {
             if (!response.ok) throw new Error("No se pudo leer data.json");
             return response.json();
@@ -553,21 +553,29 @@ async function openAdminMode() {
     const inputHash = CryptoJS.SHA256(password).toString();
 
     try {
-        const response = await fetch('secret.bin');
+        const response = await fetch('config/secret.bin');
         if (!response.ok) throw new Error("Falta secret.bin");
         const trueHash = await response.text();
         if (inputHash.trim() === trueHash.trim()) {
+            
             // 2. Si es correcto, CONSTRUIMOS el form
             console.log("Abriendo editor con datos:", currentData);
             buildAdminForm();
+            
             if (!adminModalInstance) {
                 adminModalInstance = bootstrap.Modal.getOrCreateInstance(document.getElementById('adminModal'));
             }
+            
             // Snapshot para comparar cambios
-            fetch('data.json?ts=' + Date.now())
+            fetch('config/data.json?ts=' + Date.now())
                 .then(r => r.json())
                 .then(json => { originalConfigJSON = JSON.stringify(json); });
+            
             adminModalInstance.show();
+
+            if (window.initGoogleIntegration) {
+                window.initGoogleIntegration();
+            }
         } else {
             alert("⛔ Contraseña incorrecta");
         }
